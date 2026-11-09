@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fff7e8">
+<meta name="description" content="تطبيق تعليمي بسيط للأطفال لتعلم الحيوانات والألوان والأشكال مع النطق الصوتي.">
+<title>نتعلّم ونلعب</title>
+<style>
+:root{--ink:#253047;--paper:#fffaf1;--pink:#ff7e9d;--blue:#69c9ed;--yellow:#ffd65a;--green:#83d9ae;--purple:#b69af5}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif}
+body{min-height:100dvh;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);-webkit-tap-highlight-color:transparent}
+button{font:inherit;touch-action:manipulation;cursor:pointer}
+button:focus-visible{outline:3px solid #315fbd;outline-offset:3px}
+.app{max-width:760px;margin:auto;padding:18px 16px 28px}
+header{text-align:center;padding:10px 4px 18px}
+.logo{display:inline-grid;place-items:center;width:76px;height:76px;border-radius:26px;background:#ffe08b;font-size:43px;box-shadow:0 7px 0 #f1c45e}
+h1{font-size:clamp(27px,7vw,38px);margin:12px 0 3px;font-weight:900}
+.subtitle{font-size:17px;color:#647087;margin:0}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0 20px}
+.tab{border:0;border-radius:20px;padding:13px 5px;background:white;box-shadow:0 4px 0 #e8e2d8;font-weight:900;font-size:17px;color:var(--ink)}
+.tab .emoji{display:block;font-size:28px;margin-bottom:2px}
+.tab{font-size:15px}
+.card .detail{font-size:14px;font-weight:700;color:#58647a;text-align:center;line-height:1.5}
+.letter-card .picture{font-size:clamp(58px,16vw,82px);font-weight:1000}
+@media(max-width:390px){.tabs{grid-template-columns:repeat(2,1fr)}}
+.tab[aria-pressed=true]{background:#ffe08b;box-shadow:0 4px 0 #e8bd4d;transform:translateY(-2px)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.card{min-height:154px;border:0;border-radius:25px;padding:13px 8px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-shadow:0 6px 0 rgba(35,45,60,.10);color:var(--ink);transition:transform .12s,box-shadow .12s}
+.card:active{transform:translateY(4px) scale(.98);box-shadow:0 2px 0 rgba(35,45,60,.10)}
+.card .picture{font-size:clamp(54px,15vw,76px);line-height:1.25}
+.card .name{font-size:20px;font-weight:900}
+.card .hint{font-size:13px;opacity:.7;font-weight:700}
+.c1{background:#ffe1e8}.c2{background:#dff4ff}.c3{background:#e4f8e9}.c4{background:#fff0c9}.c5{background:#eee7ff}.c6{background:#ffe8d6}
+.tip{margin:20px 2px 0;text-align:center;font-size:14px;color:#697489;line-height:1.8}
+.status{min-height:26px;margin:8px 0 0;text-align:center;font-size:13px;color:#58647a}
+.overlay{position:fixed;inset:0;z-index:5;background:rgba(31,39,55,.55);display:none;align-items:center;justify-content:center;padding:20px}
+.overlay.show{display:flex}
+.big-card{width:min(100%,420px);min-height:390px;border-radius:34px;background:#fffaf1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;box-shadow:0 20px 60px #1d263944;animation:pop .18s ease-out}
+@keyframes pop{from{transform:scale(.88);opacity:.5}to{transform:scale(1);opacity:1}}
+.big-picture{font-size:clamp(100px,28vw,150px);line-height:1.25}
+.big-name{font-size:36px;font-weight:1000;margin:8px 0 18px;text-align:center}
+.actions{display:flex;flex-wrap:wrap;justify-content:center;gap:9px}
+.listen,.stop{border:0;border-radius:18px;padding:13px 18px;font-size:17px;font-weight:900;min-height:50px}
+.listen{background:#253047;color:white}
+.stop{background:#e8edf4;color:#253047}
+.close{margin-top:12px;border:0;background:transparent;color:#667085;font-size:17px;padding:10px 20px}
+footer{text-align:center;margin-top:24px;color:#8a91a0;font-size:12px}
+@media(min-width:600px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.card{min-height:170px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="logo" aria-hidden="true">🧸</div>
+  <h1>نتعلّم ونلعب</h1>
+  <p class="subtitle">اضغط على الصورة واسمع الاسم! 🌈</p>
+</header>
+<nav class="tabs" aria-label="أقسام التعلم">
+  <button class="tab" data-kind="animals" aria-pressed="true"><span class="emoji">🐶</span>الحيوانات</button>
+  <button class="tab" data-kind="colors" aria-pressed="false"><span class="emoji">🎨</span>الألوان</button>
+  <button class="tab" data-kind="shapes" aria-pressed="false"><span class="emoji">🔺</span>الأشكال</button>
+  <button class="tab" data-kind="arabic" aria-pressed="false"><span class="emoji">أ</span>الحروف العربية</button>
+  <button class="tab" data-kind="french" aria-pressed="false"><span class="emoji">🇫🇷</span>الحروف الفرنسية</button>
+</nav>
+<main id="cards" class="grid" aria-live="polite"></main>
+<p class="status" id="status" role="status" aria-live="polite">جاري تجهيز الصوت…</p>
+<p class="tip">👆 لمسة واحدة تكفي — جرّبوا معاً وكرّروا الكلمات بصوت عالٍ<br>🔊 النطق يستعمل محرك الصوت الموجود في الهاتف. العمل دون إنترنت يعتمد على توفر صوت عربي محمّل مسبقاً في الجهاز.</p>
+<footer>تطبيق تعليمي بسيط للأطفال الصغار</footer>
+</div>
+
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="bigName" aria-hidden="true">
+  <div class="big-card">
+    <div class="big-picture" id="bigPicture" aria-hidden="true">🐱</div>
+    <div class="big-name" id="bigName">قطة</div>
+    <div id="bigDetail" class="detail" style="font-size:17px;margin:-8px 0 16px;text-align:center"></div>
+    <div class="actions">
+      <button class="listen" id="listen" type="button">🔊 اسمع مرة أخرى</button>
+      <button class="stop" id="stop" type="button">⏹ إيقاف الصوت</button>
+    </div>
+    <button class="close" id="close" type="button">إغلاق ✨</button>
+  </div>
+</div>
+
+<script>
+(()=>{
+ "use strict";
+ const data={
+  animals:[
+   ["🐱","قِطّة","القطة حيوان أليف يقول: مياو.","قطة"],["🐶","كَلْب","الكلب صديق الإنسان ويقول: هو هو.","كلب"],
+   ["🐰","أَرْنَب","الأرنب له أذنان طويلتان.","أرنب"],["🐮","بَقَرَة","البقرة تعطينا الحليب.","بقرة"],
+   ["🐑","خَرُوف","الخروف صوته: ماء ماء.","خروف"],["🦁","أَسَد","الأسد حيوان قوي يُسمّى ملك الغابة.","أسد"],
+   ["🐘","فِيل","الفيل له خرطوم طويل.","فيل"],["🐦","عُصْفُور","العصفور يطير في السماء.","عصفور"],
+   ["🐟","سَمَكَة","السمكة تعيش في الماء.","سمكة"],["🐢","سُلَحْفَاة","السلحفاة تمشي ببطء وتحمل بيتها.","سلحفاة"],
+   ["🐴","حِصَان","الحصان يجري بسرعة.","حصان"],["🦆","بَطَّة","البطة تحب السباحة.","بطة"]
+  ],
+  colors:[
+   ["🟥","أَحْمَر","مثل لون التفاحة والفراولة.","أحمر"],["🟦","أَزْرَق","مثل لون السماء والبحر.","أزرق"],
+   ["🟨","أَصْفَر","مثل لون الشمس والموز.","أصفر"],["🟩","أَخْضَر","مثل لون العشب والأوراق.","أخضر"],
+   ["🟧","بُرْتُقَالِي","مثل لون البرتقال والجزر.","برتقالي"],["🟪","بَنَفْسَجِي","لون جميل مثل بعض الأزهار.","بنفسجي"],
+   ["⬛","أَسْوَد","مثل لون الليل.","أسود"],["⬜","أَبْيَض","مثل لون الحليب والثلج.","أبيض"]
+  ],
+  shapes:[
+   ["🔴","دَائِرَة","شكل مستدير، مثل الكرة.","دائرة"],["🟥","مُرَبَّع","له أربعة أضلاع متساوية.","مربع"],
+   ["🔺","مُثَلَّث","له ثلاثة أضلاع وثلاث زوايا.","مثلث"],["⭐","نَجْمَة","لها رؤوس تلمع في السماء.","نجمة"],
+   ["❤️","قَلْب","شكل القلب الجميل.","قلب"],["▭","مُسْتَطِيل","له أربعة أضلاع، وكل ضلعين متقابلين متساويان.","مستطيل"],
+   ["🥚","بَيْضَاوِي","يشبه شكل البيضة.","بيضاوي"],["💎","مُعَيَّن","شكل يشبه الماسة.","معين"]
+  ],
+  arabic:[
+   ["ا","أَلِف","أَسَد — أ","ألف"],["ب","بَاء","بَطَّة — ب","باء"],["ت","تَاء","تُفَّاح — ت","تاء"],
+   ["ث","ثَاء","ثَعْلَب — ث","ثاء"],["ج","جِيم","جَمَل — ج","جيم"],["ح","حَاء","حِصَان — ح","حاء"],
+   ["خ","خَاء","خَرُوف — خ","خاء"],["د","دَال","دُب — د","دال"],["ذ","ذَال","ذُرَّة — ذ","ذال"],
+   ["ر","رَاء","رُمَّان — ر","راء"],["ز","زَاي","زَهْرَة — ز","زاي"],["س","سِين","سَمَكَة — س","سين"],
+   ["ش","شِين","شَمْس — ش","شين"],["ص","صَاد","صَقْر — ص","صاد"],["ض","ضَاد","ضِفْدَع — ض","ضاد"],
+   ["ط","طَاء","طَائِر — ط","طاء"],["ظ","ظَاء","ظَرْف — ظ","ظاء"],["ع","عَيْن","عِنَب — ع","عين"],
+   ["غ","غَيْن","غُرَاب — غ","غين"],["ف","فَاء","فِيل — ف","فاء"],["ق","قَاف","قَمَر — ق","قاف"],
+   ["ك","كَاف","كِتَاب — ك","كاف"],["ل","لَام","لَيْمُون — ل","لام"],["م","مِيم","مَوْز — م","ميم"],
+   ["ن","نُون","نَجْمَة — ن","نون"],["ه","هَاء","هِلال — ه","هاء"],["و","وَاو","وَرْدَة — و","واو"],["ي","يَاء","يَد — ي","ياء"]
+  ],
+  french:[
+   ["A","a","A comme Avion — طائرة","a"],["B","bé","B comme Ballon — كرة","bé"],["C","cé","C comme Chat — قطة","cé"],
+   ["D","dé","D comme Dinosaure — ديناصور","dé"],["E","euh","E comme Éléphant — فيل","euh"],["F","effe","F comme Fleur — زهرة","effe"],
+   ["G","gé","G comme Girafe — زرافة","gé"],["H","ache","H comme Hibou — بومة","ache"],["I","i","I comme Igloo — بيت ثلجي","i"],
+   ["J","ji","J comme Jouet — لعبة","ji"],["K","ka","K comme Kiwi — كيوي","ka"],["L","elle","L comme Lion — أسد","elle"],
+   ["M","emme","M comme Maison — منزل","emme"],["N","enne","N comme Nuage — سحابة","enne"],["O","o","O comme Orange — برتقالة","o"],
+   ["P","pé","P comme Pomme — تفاحة","pé"],["Q","ku","Q comme Quatre — أربعة","ku"],["R"," erre","R comme Robot — روبوت","erre"],
+   ["S","esse","S comme Soleil — شمس","esse"],["T","té","T comme Train — قطار","té"],["U","u","U comme Usine — مصنع","u"],
+   ["V","vé","V comme Vélo — دراجة","vé"],["W","double vé","W comme Wagon — عربة","double vé"],["X","िक्स","X comme Xylophone — إكسيلوفون","ix"],
+   ["Y","i grec","Y comme Yaourt — ياغورت","i grec"],["Z","zède","Z comme Zèbre — حمار وحشي","zède"]
+  ]
+ };
+ const cardColors=["c1","c2","c3","c4","c5","c6"];
+ const cards=document.getElementById("cards");
+ const overlay=document.getElementById("overlay");
+ const bigPicture=document.getElementById("bigPicture");
+ const bigName=document.getElementById("bigName");
+ const bigDetail=document.getElementById("bigDetail");
+ const status=document.getElementById("status");
+ const listenButton=document.getElementById("listen");
+ const stopButton=document.getElementById("stop");
+ const closeButton=document.getElementById("close");
+ let current=["🐱","قِطّة","القطة حيوان أليف يقول: مياو.","قطة"];
+ let active="animals";
+ let arabicVoice=null;
+ let previousFocus=null;
+ let speakTimer=null;
+ let voiceList=[];
+ const supported=("speechSynthesis" in window) && (typeof window.SpeechSynthesisUtterance!=="undefined");
+
+ function setStatus(message){status.textContent=message;}
+ function loadArabicVoice(){
+  if(!supported){setStatus("النطق الصوتي غير مدعوم في هذا المتصفح.");return;}
+  voiceList=window.speechSynthesis.getVoices()||[];
+  arabicVoice=voiceList.find(v=>/^ar[-_]MA$/i.test(v.lang))
+   ||voiceList.find(v=>/^ar[-_](DZ|TN|EG|SA|AE|QA|KW|BH|OM|JO|LB|PS|IQ|YE|SY|SD|LY)$/i.test(v.lang))
+   ||voiceList.find(v=>/^ar([_-]|$)/i.test(v.lang))
+   ||null;
+  if(arabicVoice){
+   setStatus("الصوت العربي متوفر: "+arabicVoice.name);
+  }else{
+   const frenchAvailable=voiceList.some(v=>/^fr([-_]|$)/i.test(v.lang));
+   setStatus("العربية: "+(arabicVoice?"متوفرة":"الصوت العربي غير موجود")+
+    " • الفرنسية: "+(frenchAvailable?"متوفرة":"قد تحتاج تثبيت صوت فرنسي")+
+    ". الأصوات تُدار من إعدادات الهاتف.");
+  }
+ }
+ function cleanArabic(value){
+  return value.normalize("NFC").replace(/[\u064B-\u065F\u0670]/g,"").trim();
+ }
+ function stopSpeech(){
+  if(speakTimer!==null){clearTimeout(speakTimer);speakTimer=null;}
+  if(supported) window.speechSynthesis.cancel();
+ }
+ function speak(){
+  if(!supported){
+   setStatus("عذراً، النطق الصوتي غير مدعوم في هذا المتصفح.");
+   return;
+  }
+  stopSpeech();
+  const spokenText=current[3]||current[1];
+  const utterance=new SpeechSynthesisUtterance(cleanArabic(spokenText));
+  const isFrench=active==="french";
+  utterance.lang=isFrench?"fr-FR":((arabicVoice&&arabicVoice.lang)||"ar");
+  if(isFrench){
+   const frenchVoice=voiceList.find(v=>/^fr([-_]|$)/i.test(v.lang));
+   if(frenchVoice) utterance.voice=frenchVoice;
+  }else if(arabicVoice){utterance.voice=arabicVoice;}
+  utterance.rate=0.78;
+  utterance.pitch=1.08;
+  utterance.volume=1;
+  utterance.onstart=()=>setStatus("كننطقو: "+cleanArabic(current[3]||current[1]));
+  utterance.onend=()=>setStatus("سالينا النطق. اضغط على بطاقة أخرى للتعلّم.");
+  utterance.onerror=(event)=>{
+   if(event.error!=="canceled" && event.error!=="interrupted"){
+    setStatus("ما قدرش الهاتف ينطق الكلمة. تأكد من إعدادات الصوت العربي.");
+   }
+  };
+  // بعض المتصفحات المحمولة تحتاج مهلة قصيرة بعد cancel.
+  speakTimer=window.setTimeout(()=>{
+   speakTimer=null;
+   try{window.speechSynthesis.speak(utterance);}
+   catch(error){setStatus("وقع مشكل أثناء تشغيل الصوت. جرّب مرة أخرى.");}
+  },100);
+ }
+ function openCard(item){
+  current=item;
+  bigPicture.textContent=item[0];
+  bigName.textContent=item[1];
+  bigDetail.textContent=item[2]||"";
+  previousFocus=document.activeElement;
+  overlay.classList.add("show");
+  overlay.setAttribute("aria-hidden","false");
+  closeButton.focus();
+  speak();
+ }
+ function close(){
+  overlay.classList.remove("show");
+  overlay.setAttribute("aria-hidden","true");
+  stopSpeech();
+  if(previousFocus && typeof previousFocus.focus==="function") previousFocus.focus();
+ }
+ function render(kind){
+  if(!data[kind]) return;
+  active=kind;
+  stopSpeech();
+  cards.innerHTML="";
+  document.querySelectorAll(".tab").forEach(button=>{
+   button.setAttribute("aria-pressed",String(button.dataset.kind===kind));
+  });
+  data[kind].forEach((item,index)=>{
+   const button=document.createElement("button");
+   button.type="button";
+   button.className="card "+cardColors[index%cardColors.length]+(kind==="arabic"||kind==="french"?" letter-card":"");
+   const picture=document.createElement("span");
+   picture.className="picture";picture.setAttribute("aria-hidden","true");picture.textContent=item[0];
+   const name=document.createElement("span");
+   name.className="name";name.textContent=item[1];
+   const detail=document.createElement("span");detail.className="detail";detail.textContent=item[2]||"";
+   const hint=document.createElement("span");
+   hint.className="hint";hint.textContent="اضغط واسمع 🔊";
+   button.append(picture,name,detail,hint);
+   button.addEventListener("click",()=>openCard(item));
+   cards.appendChild(button);
+  });
+ }
+ document.querySelectorAll(".tab").forEach(button=>{
+  button.addEventListener("click",()=>render(button.dataset.kind));
+ });
+ listenButton.addEventListener("click",speak);
+ stopButton.addEventListener("click",()=>{stopSpeech();setStatus("تم إيقاف الصوت.");});
+ closeButton.addEventListener("click",close);
+ overlay.addEventListener("click",event=>{if(event.target===overlay)close();});
+ document.addEventListener("keydown",event=>{
+  if(!overlay.classList.contains("show")) return;
+  if(event.key==="Escape"){close();return;}
+  if(event.key==="Tab"){
+   const focusable=[listenButton,stopButton,closeButton];
+   const first=focusable[0],last=focusable[focusable.length-1];
+   if(event.shiftKey && document.activeElement===first){event.preventDefault();last.focus();}
+   else if(!event.shiftKey && document.activeElement===last){event.preventDefault();first.focus();}
+  }
+ });
+ if(supported){
+  loadArabicVoice();
+  window.speechSynthesis.addEventListener
+   ? window.speechSynthesis.addEventListener("voiceschanged",loadArabicVoice)
+   : window.speechSynthesis.onvoiceschanged=loadArabicVoice;
+ }
+ render("animals");
+})();
+</script>
+</body>
+</html>
