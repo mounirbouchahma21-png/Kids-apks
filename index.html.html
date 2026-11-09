@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fff7e8">
+<title>نتعلّم ونلعب</title>
+<style>
+:root{--ink:#253047;--paper:#fffaf1;--pink:#ff7e9d;--blue:#69c9ed;--yellow:#ffd65a;--green:#83d9ae;--purple:#b69af5}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif}
+body{min-height:100dvh;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);-webkit-tap-highlight-color:transparent}
+button{font:inherit;touch-action:manipulation}
+.app{max-width:760px;margin:auto;padding:18px 16px 28px}
+header{text-align:center;padding:10px 4px 18px}
+.logo{display:inline-grid;place-items:center;width:76px;height:76px;border-radius:26px;background:#ffe08b;font-size:43px;box-shadow:0 7px 0 #f1c45e}
+h1{font-size:clamp(27px,7vw,38px);margin:12px 0 3px;font-weight:900}
+.subtitle{font-size:17px;color:#647087;margin:0}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0 20px}
+.tab{border:0;border-radius:20px;padding:13px 5px;background:white;box-shadow:0 4px 0 #e8e2d8;font-weight:900;font-size:17px;color:var(--ink)}
+.tab .emoji{display:block;font-size:28px;margin-bottom:2px}
+.tab[aria-pressed=true]{background:#ffe08b;box-shadow:0 4px 0 #e8bd4d;transform:translateY(-2px)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.card{min-height:154px;border:0;border-radius:25px;padding:13px 8px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-shadow:0 6px 0 rgba(35,45,60,.10);color:var(--ink);transition:transform .12s,box-shadow .12s}
+.card:active{transform:translateY(4px) scale(.98);box-shadow:0 2px 0 rgba(35,45,60,.10)}
+.card .picture{font-size:clamp(54px,15vw,76px);line-height:1.25}
+.card .name{font-size:20px;font-weight:900}
+.card .hint{font-size:13px;opacity:.7;font-weight:700}
+.c1{background:#ffe1e8}.c2{background:#dff4ff}.c3{background:#e4f8e9}.c4{background:#fff0c9}.c5{background:#eee7ff}.c6{background:#ffe8d6}
+.tip{margin:20px 2px 0;text-align:center;font-size:14px;color:#697489}
+.overlay{position:fixed;inset:0;z-index:5;background:rgba(31,39,55,.45);display:none;align-items:center;justify-content:center;padding:20px}
+.overlay.show{display:flex}
+.big-card{width:min(100%,420px);min-height:390px;border-radius:34px;background:#fffaf1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;box-shadow:0 20px 60px #1d263944;animation:pop .18s ease-out}
+@keyframes pop{from{transform:scale(.88);opacity:.5}to{transform:scale(1);opacity:1}}
+.big-picture{font-size:clamp(100px,28vw,150px);line-height:1.25}
+.big-name{font-size:36px;font-weight:1000;margin:8px 0 18px}
+.listen{border:0;border-radius:22px;padding:14px 28px;background:#253047;color:white;font-size:20px;font-weight:900;min-width:180px}
+.close{margin-top:15px;border:0;background:transparent;color:#667085;font-size:17px;padding:10px 20px}
+footer{text-align:center;margin-top:24px;color:#8a91a0;font-size:12px}
+@media(min-width:600px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.card{min-height:170px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="logo" aria-hidden="true">🧸</div>
+  <h1>نتعلّم ونلعب</h1>
+  <p class="subtitle">اضغط على الصورة واسمع الاسم! 🌈</p>
+</header>
+<nav class="tabs" aria-label="أقسام التعلم">
+  <button class="tab" data-kind="animals" aria-pressed="true"><span class="emoji">🐶</span>الحيوانات</button>
+  <button class="tab" data-kind="colors" aria-pressed="false"><span class="emoji">🎨</span>الألوان</button>
+  <button class="tab" data-kind="shapes" aria-pressed="false"><span class="emoji">🔺</span>الأشكال</button>
+</nav>
+<main id="cards" class="grid" aria-live="polite"></main>
+<p class="tip">👆 لمسة واحدة تكفي — جرّبوا معاً وكرّروا الكلمات بصوت عالٍ<br>🔊 الصوت من محرك النطق المثبّت في الهاتف، ولا يحتاج إلى الإنترنت</p>
+<footer>تطبيق تعليمي بسيط للأطفال الصغار • يعمل دون اتصال بالإنترنت</footer>
+</div>
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-label="بطاقة تعليمية">
+  <div class="big-card">
+    <div class="big-picture" id="bigPicture">🐱</div>
+    <div class="big-name" id="bigName">قطة</div>
+    <button class="listen" id="listen">🔊 اسمع مرة أخرى</button>
+    <button class="close" id="close">إغلاق ✨</button>
+  </div>
+</div>
+<script>
+(()=>{
+ const data={
+  animals:[
+   ["🐱","قِطّة"],["🐶","كَلْب"],["🐰","أَرْنَب"],["🐮","بَقَرَة"],
+   ["🐑","خَرُوف"],["🦁","أَسَد"],["🐘","فِيل"],["🐦","عُصْفُور"],
+   ["🐟","سَمَكَة"],["🐢","سُلَحْفَاة"],["🐴","حِصَان"],["🦆","بَطَّة"]
+  ],
+  colors:[
+   ["🟥","أَحْمَر"],["🟦","أَزْرَق"],["🟨","أَصْفَر"],["🟩","أَخْضَر"],
+   ["🟧","بُرْتُقَالِي"],["🟪","بَنَفْسَجِي"],["⬛","أَسْوَد"],["⬜","أَبْيَض"]
+  ],
+  shapes:[
+   ["🔴","دَائِرَة"],["🟥","مُرَبَّع"],["🔺","مُثَلَّث"],["⭐","نَجْمَة"],
+   ["❤️","قَلْب"],["⬭","مُسْتَطِيل"]
+  ]
+ };
+ const colors=["c1","c2","c3","c4","c5","c6"];
+ const cards=document.getElementById("cards"),overlay=document.getElementById("overlay");
+ const bigPicture=document.getElementById("bigPicture"),bigName=document.getElementById("bigName");
+ let current=["🐱","قِطّة"],active="animals";
+ function render(kind){
+  active=kind;cards.innerHTML="";
+  document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.kind===kind)));
+  data[kind].forEach((item,i)=>{
+   const b=document.createElement("button");b.className="card "+colors[i%colors.length];
+   b.innerHTML=`<span class="picture" aria-hidden="true">${item[0]}</span><span class="name">${item[1]}</span><span class="hint">اضغط واسمع 🔊</span>`;
+   b.addEventListener("click",()=>openCard(item));cards.appendChild(b);
+  });
+ }
+ let arabicVoice=null;
+ let speechReady=false;
+ function loadArabicVoice(){
+  if(!("speechSynthesis" in window)) return;
+  const voices=window.speechSynthesis.getVoices()||[];
+  // Prefer Moroccan Arabic, then any Arabic voice installed on the device.
+  arabicVoice=voices.find(v=>/^ar-MA$/i.test(v.lang))
+    ||voices.find(v=>/^ar-(MA|DZ|TN)$/i.test(v.lang))
+    ||voices.find(v=>/^ar([_-]|$)/i.test(v.lang))
+    ||null;
+  speechReady=true;
+ }
+ function cleanArabic(text){
+  return text.normalize("NFC").replace(/[\\u064B-\\u065F\\u0670]/g,"").trim();
+ }
+ function speak(){
+  if(!("speechSynthesis" in window) || typeof SpeechSynthesisUtterance==="undefined"){
+   bigName.textContent="الصوت غير متاح في هذا الجهاز";
+   return;
+  }
+  // Use only the device's installed TTS engine/voice. No API or internet request.
+  const synth=window.speechSynthesis;
+  synth.cancel();
+  const utterance=new SpeechSynthesisUtterance(cleanArabic(current[1]));
+  utterance.lang=(arabicVoice&&arabicVoice.lang)||"ar";
+  if(arabicVoice) utterance.voice=arabicVoice;
+  utterance.rate=0.78;
+  utterance.pitch=1.08;
+  utterance.volume=1;
+  utterance.onerror=()=>{ /* Device TTS may be disabled or lack an Arabic voice. */ };
+  // A short delay helps some mobile browsers finish cancelling the previous utterance.
+  window.setTimeout(()=>synth.speak(utterance),80);
+ }
+ function openCard(item){current=item;bigPicture.textContent=item[0];bigName.textContent=item[1];overlay.classList.add("show");speak();}
+ function close(){overlay.classList.remove("show");if("speechSynthesis" in window)window.speechSynthesis.cancel();}
+ document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>render(b.dataset.kind)));
+ document.getElementById("listen").addEventListener("click",speak);
+ document.getElementById("close").addEventListener("click",close);
+ overlay.addEventListener("click",e=>{if(e.target===overlay)close();});
+ document.addEventListener("keydown",e=>{if(e.key==="Escape")close();});
+ if("speechSynthesis" in window){
+  loadArabicVoice();
+  // Android/iOS browsers may populate the voice list asynchronously.
+  window.speechSynthesis.onvoiceschanged=loadArabicVoice;
+ }
+ render("animals");
+})();
+</script>
+</body>
+</html>
